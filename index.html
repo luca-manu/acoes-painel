@@ -230,8 +230,13 @@ async function loadData() {
     var json = await jsonp(url);
     if (json.erro) throw new Error(json.erro);
 
-    const base = json['BASE_CONSOLIDADA'] || [];
-    const hist = json['HISTORICO_CARTEIRA'] || [];
+    const base     = json['BASE_CONSOLIDADA'] || [];
+    const hist     = json['HISTORICO_CARTEIRA'] || [];
+    const carteira = json['CARTEIRA'] || [];
+    const pmMap = {};
+    carteira.forEach(function(r) {
+      var tk = str(r.ATIVO); if (tk) pmMap[tk] = n(r.PRECO_MEDIO);
+    });
 
     DATA = base.map(r => ({
       ticker:  str(r.ATIVO),
@@ -239,7 +244,7 @@ async function loadData() {
       setor:   str(r.SETOR),
       qtd:     n(r.QUANTIDADE),
       preco:   n(r.PRECO_HOJE),
-      pm:      n(r.preco_medio),
+      pm:      pmMap[str(r.ATIVO)] || n(r.PRECO_MEDIO) || n(r.preco_medio),
       valor:   n(r.VALOR_ATUAL),
       peso:    n(r.PESO_REAL_PCT),
       alvo:    n(r.PATRIMONIO_ALVO_PCT),
@@ -426,7 +431,7 @@ function buildDetail(a) {
         <canvas id="hist-cv" role="img" aria-label="Histórico do patrimônio">Evolução do patrimônio ao longo do período.</canvas>
       </div>
     </div>
-    <button class="btn-ai" onclick="sendPrompt('Analise o ativo ${a.ticker} da minha carteira: score ${sc}, retorno ${fmt(a.retorno,1)}, desconto teto ${fmt(a.desc,1)}, DY ${a.dy !== null ? a.dy.toFixed(1) + '%' : 'sem DY'} Dê recomendação objetiva: comprar mais, manter ou reduzir. Aponte o principal risco.')>
+    <button class="btn-ai" onclick="sendPrompt('Analise o ativo ${a.ticker} da minha carteira: score ${sc}, retorno ${fmt(a.retorno,1)}, desconto teto ${fmt(a.desc,1)}, DY ${a.dy!==null?a.dy.toFixed(1)+\\'%\\':\\'sem DY\\'}. Dê recomendação objetiva: comprar mais, manter ou reduzir. Aponte o principal risco.')>
       <i class="ti ti-robot"></i> Analisar ${a.ticker} com IA ↗
     </button>`;
 
