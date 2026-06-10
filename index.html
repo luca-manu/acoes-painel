@@ -426,7 +426,7 @@ function buildDetail(a) {
         <canvas id="hist-cv" role="img" aria-label="Histórico do patrimônio">Evolução do patrimônio ao longo do período.</canvas>
       </div>
     </div>
-    <button class="btn-ai" onclick="sendPrompt('Analise o ativo ${a.ticker} da minha carteira: score ${sc}, retorno ${fmt(a.retorno,1)}, desconto teto ${fmt(a.desc,1)}, DY ${a.dy!==null?a.dy.toFixed(1)+\\'%\\':\\'sem DY\\'}. Dê recomendação objetiva: comprar mais, manter ou reduzir. Aponte o principal risco.')">
+    <button class="btn-ai" onclick="sendPrompt('Analise o ativo ${a.ticker} da minha carteira: score ${sc}, retorno ${fmt(a.retorno,1)}, desconto teto ${fmt(a.desc,1)}, DY ${a.dy!==null?a.dy.toFixed(1)+\\'%\\':\\'sem DY\\'}` Dê recomendação objetiva: comprar mais, manter ou reduzir. Aponte o principal risco.')">
       <i class="ti ti-robot"></i> Analisar ${a.ticker} com IA ↗
     </button>`;
 
