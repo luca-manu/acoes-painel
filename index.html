@@ -201,15 +201,33 @@ let activeFilter = 'ALL', selectedTicker = null;
 let histChart = null, sortCol = 'score', sortDir = -1;
 let countdown = REFRESH_MS / 1000, countdownTimer;
 
+// ── JSONP (resolve CORS com Apps Script) ─────────
+function jsonp(url) {
+  return new Promise(function(resolve, reject) {
+    var cb = 'cb_' + Date.now();
+    var script = document.createElement('script');
+    window[cb] = function(data) {
+      delete window[cb];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+    script.onerror = function() {
+      delete window[cb];
+      document.body.removeChild(script);
+      reject(new Error('Falha ao conectar ao Apps Script'));
+    };
+    script.src = url + '&callback=' + cb;
+    document.body.appendChild(script);
+  });
+}
+
 // ── FETCH ────────────────────────────────────────
 async function loadData() {
   setOverlay(true, 'Buscando dados…');
   setSpinning(true);
   try {
-    const url = `${SCRIPT_URL}?token=${encodeURIComponent(TOKEN)}`;
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const json = await r.json();
+    var url = SCRIPT_URL + '?token=' + encodeURIComponent(TOKEN);
+    var json = await jsonp(url);
     if (json.erro) throw new Error(json.erro);
 
     const base = json['BASE_CONSOLIDADA'] || [];
